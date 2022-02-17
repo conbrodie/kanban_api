@@ -1,0 +1,21 @@
+.bg-light-grey {
+    background-color: #F9FAFC;
+}
+
+.shadow-md {
+    box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 5px 0;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list>* {
+    margin: 10px 0px;
+}
