@@ -7,4 +7,8 @@ An API designed to simulate a simple kanban board. Built using .Net core and use
 
 # Getting Started 
 
-git clone 
+git clone https://github.com/conbrodie/kanban_api.git && cd api 
+
+Create a .env file with following variables ...
+
+docker-compose up -d
