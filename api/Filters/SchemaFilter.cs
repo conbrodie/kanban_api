@@ -67,5 +67,13 @@ public class ExampleSchemaFilter : ISchemaFilter
                 ["userId"] = new OpenApiInteger(0),
             };
         }
+
+        if (context.Type == typeof(CardMember))
+        {
+            schema.Example = new OpenApiObject()
+            {
+                ["userId"] = new OpenApiInteger(0),
+            };
+        }
     }
 }

@@ -2,12 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using System;
-using System.Linq;
 using api.Models;
 using api.Repositories;
-using Microsoft.AspNetCore.Http;
 using api.DTO;
 using AutoMapper;
 
@@ -38,10 +34,13 @@ namespace api.Controllers
         /// <response code="200">Returns a list of users.</response>
         [ProducesResponseType(200)]
         [HttpGet("all")]
-        public async Task<ActionResult<ICollection<User>>> GetUsers ()
+        public async Task<ActionResult<ICollection<UserDTO>>> GetUsers ()
         {
-           return Ok(await _userRepository.GetUsers());
+            var users = await _userRepository.GetUsers();
 
+            ICollection<UserDTO> userDTOs = _mapper.Map<ICollection<User>, ICollection<UserDTO>>(users);
+
+            return Ok(userDTOs);
         }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [HttpGet("{userId}")]
-        public async Task<ActionResult<User>> GetUser (int userId)
+        public async Task<ActionResult<UserDTO>> GetUser (int userId)
         {
            var user = await _userRepository.GetUserByIdAsync(userId);
 
@@ -64,7 +63,9 @@ namespace api.Controllers
                return NotFound();
            }
 
-           return Ok(user);
+           var userDTO = _mapper.Map<UserDTO>(user);
+
+           return Ok(userDTO);
         }
 
         /// <summary>

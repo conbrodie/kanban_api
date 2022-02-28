@@ -68,6 +68,7 @@ namespace api.Repositories
                     .ThenInclude(list => list.Cards.OrderBy(card => card.Order))
                 .AsSplitQuery()
                 .Where(p => p.ProjectId == ProjectId)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             return project;
@@ -137,14 +138,13 @@ namespace api.Repositories
         /// Updates a project.
         /// </summary>
         /// <param name="project">Project object being updated</param>
-        /// <param name="projectCreatorId">A List of user id's (users who created the project)</param>
-        /// <param name="projectSponsorId">A list of user id's (users who sponsored the project)</param>
-        /// <param name="projectDepartmentId">A list of department id's (departments the project is in)</param>
+        /// <param name="userId">A List of user id's (users who created the project)</param>
+        /// <param name="departmentId">A list of department id's (departments the project is in)</param>
         /// <returns>Updated record in the database</returns>
 
         public async Task<bool> UpdateProject(Project project, List<int> userId, List<int> departmentId)
         {
-            var users = await _context.Users.Where(user => userId.Contains(user.Id)).ToListAsync();
+            var users = await _context.Users.Where(user => userId.Contains(user.Id)).AsNoTracking().ToListAsync();
             var departments = await _context.Departments.Where(dep => departmentId.Contains(dep.DepartmentId)).ToListAsync();
 
             var projectMembersToDelete = await _context.ProjectMembers.Where(p => p.ProjectId == project.ProjectId).ToListAsync();

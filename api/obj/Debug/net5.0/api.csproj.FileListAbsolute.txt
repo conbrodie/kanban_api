@@ -127,8 +127,6 @@ C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.AssemblyInfo
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.csproj.CoreCompileInputs.cache
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.RazorAssemblyInfo.cache
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.RazorAssemblyInfo.cs
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.dll
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\ref\api.dll
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.pdb
@@ -143,7 +141,6 @@ C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\api.dll
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\ref\api.dll
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\api.pdb
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\api.Views.dll
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\api.Views.pdb
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\AspNet.Security.OAuth.GitHub.dll
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\AspNet.Security.OAuth.Slack.dll
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\AutoMapper.dll
@@ -232,15 +229,7 @@ C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\runtimes\win\lib
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\scopedcss\bundle\api.styles.css
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\staticwebassets\api.StaticWebAssets.Manifest.cache
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\staticwebassets\api.StaticWebAssets.xml
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.TagHelpers.input.cache
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.TagHelpers.output.cache
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.RazorCoreGenerate.cache
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\Razor\Views\Account\Login.cshtml.g.cs
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\Razor\Views\Account\Logout.cshtml.g.cs
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\Razor\Views\Account\_ValidationSummary.cshtml.g.cs
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.RazorTargetAssemblyInfo.cache
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.RazorTargetAssemblyInfo.cs
-C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.Views.pdb
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.csproj.CopyComplete
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.genruntimeconfig.cache
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\api.xml

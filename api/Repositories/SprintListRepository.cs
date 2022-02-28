@@ -20,7 +20,7 @@ namespace api.Repositories
 
         public async Task<bool> CreateSprintList(SprintList sprintList)
         {
-            await _context.AddAsync(sprintList);
+            _context.Add(sprintList);
             return await Save();
         }
 
@@ -32,7 +32,15 @@ namespace api.Repositories
 
         public async Task<ICollection<SprintList>> GetListsForSprint(int SprintId)
         {
-            return await _context.SprintLists.Where(sprintList => sprintList.SprintId == SprintId).ToListAsync();
+            return await _context.SprintLists
+                .Include(c => c.Cards)
+                    .ThenInclude(c => c.Comments)
+                        .ThenInclude(m => m.User)
+                .Include(c => c.Cards)
+                    .ThenInclude(c => c.Members)
+                        .ThenInclude(m => m.User)
+                .Where(sprintList => sprintList.SprintId == SprintId)
+                .ToListAsync();
         }
 
         public async Task<SprintList> GetSprintList(int SprintListId)

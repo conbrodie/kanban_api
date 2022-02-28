@@ -25,6 +25,7 @@ namespace api.Repositories
                 .Include(d => d.Members)
                     .ThenInclude(dm => dm.User)
                 .Where(d => d.DepartmentId == DepartmentId)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
 
@@ -155,6 +156,7 @@ namespace api.Repositories
                 };
                 _context.Add(departmentMember);
             }
+
             _context.Update(department);
 
             return await Save();      

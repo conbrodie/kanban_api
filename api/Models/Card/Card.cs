@@ -8,7 +8,8 @@ namespace api.Models
     {
         [Key] 
         public int CardId { get; set; }
-        [Required(ErrorMessage = "You must provide a sprint list for the card.")]
+        [Required]
+        [Range(1, Int32.MaxValue)]
         public int SprintListId { get; set; }
         public int Order { get; set; }
         [Required(ErrorMessage = "Card title is required.")]

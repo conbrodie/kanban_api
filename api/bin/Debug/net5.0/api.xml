@@ -68,6 +68,16 @@
             <response code="404">Not Found.</response>
             <response code="500">Something when wrong when creating the card.</response>
         </member>
+        <member name="M:api.Controllers.CardController.UpdateCard(System.Int32,api.Models.Card)">
+            <summary>
+            Updates a card.
+            </summary>
+            <returns>An updated card.</returns>
+            <response code="204">Updated the card.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something when wrong when updating the card.</response>
+        </member>
         <member name="M:api.Controllers.CardController.DeleteCard(System.Int32)">
             <summary>
             Removes a card.
@@ -282,7 +292,7 @@
             <response code="400">One or more validation errors occurred.</response>
             <response code="404">Not Found.</response>
         </member>
-        <member name="M:api.Controllers.SprintsController.GetProjectSprintList(System.Int32,System.Int32)">
+        <member name="M:api.Controllers.SprintsController.GetProjectSprintList(System.Int32,System.Int32,System.Int32)">
             <summary>
             Gets a sprint list.
             </summary>
@@ -291,7 +301,7 @@
             <response code="400">One or more validation errors occurred.</response>
             <response code="404">Not Found.</response>
         </member>
-        <member name="M:api.Controllers.SprintsController.GetProjectSprintLists(System.Int32)">
+        <member name="M:api.Controllers.SprintsController.GetProjectSprintLists(System.Int32,System.Int32)">
             <summary>
             Gets all lists for a given sprint.
             </summary>
@@ -309,7 +319,7 @@
             
                  POST /projects/{projectId}/sprints
                  {
-                    "ProjectId": 1,
+                    "SprintId": 1,
                     "SprintName": "Name",
                  }
             
@@ -416,9 +426,8 @@
             Updates a project.
             </summary>
             <param name="project">Project object being updated</param>
-            <param name="projectCreatorId">A List of user id's (users who created the project)</param>
-            <param name="projectSponsorId">A list of user id's (users who sponsored the project)</param>
-            <param name="projectDepartmentId">A list of department id's (departments the project is in)</param>
+            <param name="userId">A List of user id's (users who created the project)</param>
+            <param name="departmentId">A list of department id's (departments the project is in)</param>
             <returns>Updated record in the database</returns>
         </member>
     </members>

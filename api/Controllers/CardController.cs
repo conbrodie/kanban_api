@@ -5,24 +5,27 @@ using System.Threading.Tasks;
 using api.DTO;
 using api.Models;
 using api.Repositories;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers 
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ValidateModel]
     public class CardController : ControllerBase
     {
         private readonly ICardRepository _cardRepository;
         private readonly IUserRepository _userManager;
-         private readonly ISprintListRepository _sprintListRepository;
+        private readonly ISprintListRepository _sprintListRepository;
+        private readonly IMapper _mapper;
 
-        public CardController(ICardRepository cardRepository, IUserRepository userManager, ISprintListRepository sprintListRepository) 
+        public CardController(ICardRepository cardRepository, IUserRepository userManager, ISprintListRepository sprintListRepository, IMapper mapper) 
         {
             _cardRepository = cardRepository;
             _userManager = userManager;
             _sprintListRepository = sprintListRepository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -33,19 +36,15 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateSprintListExists]
         [HttpGet]
-        public async Task<ActionResult<Card>> GetCards([Required] int sprintListId) 
+        public async Task<ActionResult<ICollection<CardDTO>>> GetCards([Required] int sprintListId) 
         {
-            var sprintList = await _sprintListRepository.GetSprintList(sprintListId);
-
-            if (sprintList == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint list not found.");
-            }
-
             var cards = await _cardRepository.GetCards(sprintListId);
 
-            return Ok(cards);
+            ICollection<CardDTO> cardDTOs = _mapper.Map<ICollection<Card>, ICollection<CardDTO>>(cards);
+
+            return Ok(cardDTOs);
         }
 
         /// <summary>
@@ -58,17 +57,15 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateCardExists]
         [HttpGet("{cardId}")]
-        public async Task<ActionResult<Card>> GetCard([Required] int cardId) 
+        public async Task<ActionResult<CardDTO>> GetCard([Required] int cardId) 
         {
             var card = await _cardRepository.GetCard(cardId);
 
-            if (card == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Card not found.");
-            }
+            var cardDTO = _mapper.Map<CardDTO>(card);
 
-            return Ok(card);
+            return Ok(cardDTO);
         }
 
         /// <summary>
@@ -81,19 +78,15 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateCardExists]
         [HttpGet("{cardId}/members/all")]
-        public async Task<ActionResult<ICollection<UserDTO>>> GetCardMembers([Required] int cardId) 
+        public async Task<ActionResult<ICollection<CardMemberDTO>>> GetCardMembers([Required] int cardId) 
         {
-            var card = await _cardRepository.GetCard(cardId);
-
-            if (card == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Card not found.");
-            }
-
             var members = await _cardRepository.GetCardMembers(cardId);
 
-            return Ok(members);
+            ICollection<CardMemberDTO> memberDTOs = _mapper.Map<ICollection<CardMember>, ICollection<CardMemberDTO>>(members);
+
+            return Ok(memberDTOs);
         }
 
         /// <summary>
@@ -106,17 +99,16 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateCardExists]
+        [ValidateCardMemberExists]
         [HttpGet("{cardId}/members/{userId}")]
-        public async Task<ActionResult<ICollection<UserDTO>>> GetCardMember([Required] int userId) 
+        public async Task<ActionResult<ICollection<CardMemberDTO>>> GetCardMember([Required] int userId) 
         {
             var member = await _cardRepository.GetCardMember(userId);
 
-            if (member == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Member not found.");
-            }
+            var cardMemberDTO = _mapper.Map<CardMemberDTO>(member);
 
-            return Ok(member);
+            return Ok(cardMemberDTO);
         }
 
          /// <summary>
@@ -131,30 +123,29 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [ValidateCardExists]
         [HttpPost("{cardId}/members")]
         public async Task<ActionResult> AddCardMember([Required] int cardId, [Required, FromBody] CardMember cardMember) 
         {
+            var isMember = await _cardRepository.IsCardMember(cardMember.UserId);
             var card = await _cardRepository.GetCard(cardId);
-
-            if (card == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Card not found.");
-            }
-
             var user = await _userManager.GetUserByIdAsync(cardMember.UserId);
+
+            if (isMember)
+            {
+                ModelState.AddModelError(string.Empty, "The user is already a member of this card.");
+                return new BadRequestError(ModelState);
+            }
 
             if (user == null) 
             {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "User not found.");
+                ModelState.AddModelError(string.Empty, "The card member was not found.");
+                return new NotFoundError(ModelState);
             }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             if (await _cardRepository.AddMember(card, user) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when adding member {user.FirstName + " " + user.LastName}");
-                return StatusCode(500, ModelState);
+               return new InternalServerError();
             }
 
            return CreatedAtAction(nameof(GetCardMember), new { CardMemberId = cardMember.CardId }, cardMember);
@@ -172,30 +163,16 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [ValidateCardExists]
+        [ValidateCardMemberExists]
         [HttpDelete("{cardId}/members")]
         public async Task<ActionResult> RemoveCardMember([Required] int cardId, [Required, FromQuery] int userId)
         {
-            var card = await _cardRepository.GetCard(cardId);
-
-            if (card == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Card not found.");
-            }
-
             var member = await _cardRepository.GetCardMember(userId);
-
-            if (member == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "User not found.");
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             if (await _cardRepository.RemoveMember(member) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when removing member {member.User.FirstName + " " + member.User.LastName}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return NoContent();
@@ -213,38 +190,55 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [ValidateUserExists]
         [HttpPost]
         public async Task<ActionResult> CreateCard([Required, FromBody] Card card, [Required, FromQuery] int userId) 
         {
-            if (card == null)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var user = _userManager.GetUserByIdAsync(userId).Result;
-
-            if (user == null) 
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "User not found.");
-            }
-
             var sprintList = _sprintListRepository.GetSprintList(card.SprintListId).Result;
 
             if (sprintList == null) 
             {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint list not found.");
+                ModelState.AddModelError(string.Empty, "The Sprint list was not found.");
+                return new NotFoundError(ModelState);
             }
 
             if (await _cardRepository.CreateCard(card, user) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when creating {card.CardTitle}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return CreatedAtAction(nameof(GetCard), new { CardId = card.CardId }, card);
+        }
+
+         /// <summary>
+        /// Updates a card.
+        /// </summary>
+        /// <returns>An updated card.</returns>
+        /// <response code="204">Updated the card.</response>
+        /// <response code="400">One or more validation errors occurred.</response>
+        /// <response code="404">Not Found.</response>
+        /// <response code="500">Something when wrong when updating the card.</response>
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [ValidateCardExists]
+        [HttpPut("{cardId}")]
+        public async Task<ActionResult> UpdateCard([Required] int cardId, [Required, FromBody] Card card) 
+        {
+            if (cardId != card.CardId)
+            {
+                ModelState.AddModelError(string.Empty, "CardId in request body does not match path ID.");
+                return new BadRequestError(ModelState);
+            }
+
+            if (await _cardRepository.UpdateCard(card) == false)
+            {
+                return new InternalServerError();
+            }
+
+            return NoContent();
         }
 
         /// <summary>
@@ -259,20 +253,15 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [ValidateCardExists]
         [HttpDelete("{cardId}")]
         public async Task<ActionResult> DeleteCard([Required] int cardId) 
         {
             var card = await _cardRepository.GetCard(cardId);
 
-            if (card == null) 
-            {
-               throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Card not found.");
-            }
-
             if (await _cardRepository.DeleteCard(card) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when deleting {card.CardTitle}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return NoContent();

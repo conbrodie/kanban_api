@@ -48,22 +48,19 @@ namespace api
 
             // var server = Configuration["DbServer"] ?? "127.0.0.1";
             // var port = Configuration["DbPort"] ?? "1433"; // Default SQL Server port
-            // var user = Configuration["DbUser"] ?? "SA"; // Warning do not use the SA account
-            // var password = Configuration["Password"] ?? "DockerTest123";
+            // var user = Configuration["DbUser"] ?? "SA"; 
+            // var password = Configuration["Password"] ?? Environment.GetEnvironmentVariable("SA_PASSWORD");
             // var database = Configuration["Database"] ?? "kanban";
 
-            // var connectionString = $"Server={server},{port};Initial Catalog={database};User ID={user};Password={password}";
             var connectionString = "Server=localhost\\SQLEXPRESS01;Initial Catalog=kanban;Trusted_Connection=True;";
 
-            Console.WriteLine(connectionString);
-
             // Add Db context as a service to our application
-            services.AddDbContext<AppDbContext>(options => 
-                options.UseSqlServer(connectionString));
-            
-            services.AddControllersWithViews( options => {
-                options.Filters.Add<ValidateModelAttribute>();
+            services.AddDbContext<AppDbContext>(options => {
+       
+                options.UseSqlServer(connectionString);
+                options.EnableSensitiveDataLogging();            
             });
+            
 
             services.AddSwaggerGen(options =>
             {
@@ -105,14 +102,6 @@ namespace api
             services.AddScoped<ISprintsRepository, SprintRepository>();
             services.AddScoped<ISprintListRepository, SprintListRepository>();
             services.AddSingleton<IUserIdProvider, EmailBasedUserIdProvider>();
-
-            // services.PostConfigure<ApiBehaviorOptions>(apiBehaviorOptions => apiBehaviorOptions.InvalidModelStateResponseFactory = actionContext => {
-            //     return new BadRequestObjectResult(new {
-            //         StatusCode = 400,
-            //         Messages = actionContext.ModelState.Values.SelectMany(x => x.Errors)
-            //             .Select(x => x.ErrorMessage)
-            //     });
-            // });
 
             // Add mapping for DTO
             services.AddAutoMapper(typeof(MappingProfile));

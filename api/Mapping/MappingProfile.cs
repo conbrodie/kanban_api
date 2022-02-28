@@ -30,7 +30,8 @@ namespace api.Mapping
             CreateMap<DepartmentMember, DepartmentMemberDTO>()
             .ForMember(n => n.UserId, opt => opt.MapFrom(src => src.User.Id))
             .ForMember(n => n.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-            .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName));
+            .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName))
+            .ForMember(n => n.Email, opt => opt.MapFrom(src => src.User.Email));
             CreateMap<User, DepartmentMemberDTO>().ReverseMap();
 
             // CARD DTO
@@ -39,7 +40,8 @@ namespace api.Mapping
             CreateMap<CardMember, CardMemberDTO>()
             .ForMember(n => n.UserId, opt => opt.MapFrom(src => src.User.Id))
             .ForMember(n => n.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-            .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName));
+            .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName))
+            .ForMember(n => n.Email, opt => opt.MapFrom(src => src.User.Email));
             CreateMap<User, CardMemberDTO>().ReverseMap();
 
             //

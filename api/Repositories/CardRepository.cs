@@ -48,26 +48,18 @@ namespace api.Repositories
                     .ThenInclude(u => u.User)
                 .Include(ptc => ptc.Comments)
                     .ThenInclude(u => u.User)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ICollection<UserDTO>> GetCardMembers(int cardId)
+        public async Task<ICollection<CardMember>> GetCardMembers(int cardId)
         {
-            var members = await _context.CardMembers.Where(c => c.CardId == cardId).ToListAsync();
-            var memberList = new List<UserDTO>();
-
-            foreach(var member in members)
-            {
-                var user = _mapper.Map<UserDTO>(member.User);
-                memberList.Add(user);
-            }
-
-            return memberList;
+           return await _context.CardMembers.Include(cm => cm.User).Where(c => c.CardId == cardId).ToListAsync();
         }
 
         public async Task<CardMember> GetCardMember(int userId)
         {
-            return await _context.CardMembers.Where(u => u.UserId == userId).FirstOrDefaultAsync();
+            return await _context.CardMembers.Include(c => c.User).Where(u => u.UserId == userId).FirstOrDefaultAsync();
         }
 
         public async Task<ICollection<Card>> GetCards(int sprintListId)
@@ -75,7 +67,7 @@ namespace api.Repositories
             return await _context.Cards.Where(c => c.SprintListId == sprintListId).ToListAsync();
         }
 
-        public async Task<bool> UpdateCard(int CardId, Card card)
+        public async Task<bool> UpdateCard(Card card)
         {
             _context.Update(card);
             return await Save();
@@ -98,6 +90,12 @@ namespace api.Repositories
         {
             _context.Remove(cardMember);
             return await Save();
+        }
+
+        public async Task<bool> IsCardMember(int userId)
+        {
+           var member = await _context.CardMembers.Where(cm => cm.UserId == userId).FirstOrDefaultAsync();
+           return member == null ? false : true;
         }
 
           public async Task<bool> Save()

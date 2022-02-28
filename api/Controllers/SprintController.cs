@@ -10,7 +10,6 @@ using AutoMapper;
 
 namespace api.Controllers
 {
-    [ApiController]
     [Route("api/projects")]
     public class SprintsController : ControllerBase
     {   
@@ -37,22 +36,12 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateProjectExists]
+        [ValidateSprintExists]
         [HttpGet("{ProjectId}/sprints/{sprintId}")]
         public async Task<ActionResult<SprintDTO>> GetProjectSprint ([Required] int ProjectId, [Required] int sprintId) 
         {
-            var project = await _projectsRepository.GetProject(ProjectId);
-
-            if (project == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Project not found.");
-            }
-
             var sprint = await _sprintRepository.GetSprint(sprintId);
-
-            if (sprint == null) 
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint not found.");  
-            }
 
             var sprintDTO = _mapper.Map<SprintDTO>(sprint);
 
@@ -69,16 +58,10 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateProjectExists]
         [HttpGet("{ProjectId}/sprints")]
         public async Task<ActionResult<ICollection<SprintDTO>>> GetProjectSprints ([Required] int ProjectId) 
         {
-            var project = await _projectsRepository.GetProject(ProjectId);
-
-            if (project == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Project not found.");
-            }
-
             var sprints = await _sprintRepository.GetSprintsForProject(ProjectId);
 
             ICollection<SprintDTO> sprintDTOs = _mapper.Map<ICollection<Sprint>, ICollection<SprintDTO>>(sprints);
@@ -96,22 +79,13 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateProjectExists]
+        [ValidateSprintExists]
+        [ValidateSprintListExists]
         [HttpGet("{ProjectId}/sprints/{SprintId}/lists/{SprintListId}")]
-        public async Task<ActionResult<SprintListDTO>> GetProjectSprintList ([Required] int SprintId, [Required] int SprintListId) 
+        public async Task<ActionResult<SprintListDTO>> GetProjectSprintList ([Required] int ProjectId, [Required] int SprintId, [Required] int SprintListId) 
         {
-            var sprint = await _sprintRepository.GetSprint(SprintId);
-
-            if (sprint == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint not found.");
-            }
-
             var list = await _sprintListRepository.GetSprintList(SprintListId);
-
-             if (list == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint list not found.");
-            }
 
             var sprintListDTO = _mapper.Map<SprintListDTO>(list);
 
@@ -128,19 +102,16 @@ namespace api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [ValidateProjectExists]
+        [ValidateSprintExists]
         [HttpGet("{ProjectId}/sprints/{SprintId}/lists")]
-        public async Task<ActionResult<ICollection<SprintList>>> GetProjectSprintLists ([Required] int SprintId) 
+        public async Task<ActionResult<ICollection<SprintListDTO>>> GetProjectSprintLists ([Required] int ProjectId, [Required] int SprintId) 
         {
-            var sprint = await _sprintRepository.GetSprint(SprintId);
-
-            if (sprint == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint not found.");
-            }
-
             var lists = await _sprintListRepository.GetListsForSprint(SprintId);
 
-            return Ok(lists);
+            ICollection<SprintListDTO> sprintListDTOs = _mapper.Map<ICollection<SprintList>, ICollection<SprintListDTO>>(lists);
+
+            return Ok(sprintListDTOs);
         }
 
          /// <summary>
@@ -151,7 +122,7 @@ namespace api.Controllers
         ///
         ///     POST /projects/{projectId}/sprints
         ///     {
-        ///        "ProjectId": 1,
+        ///        "SprintId": 1,
         ///        "SprintName": "Name",
         ///     }
         ///
@@ -165,28 +136,13 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [ValidateProjectExists]
         [HttpPost("{ProjectId}/sprints")]
         public async Task<ActionResult> CreateProjectSprint ([Required] int ProjectId, [FromBody, Required] Sprint sprint) 
         {
-            var project = await _projectsRepository.GetProject(ProjectId);
-
-            if (project == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Project not found.");
-            }
-
-            if (sprint == null) 
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             if (await _sprintRepository.CreateSprint(sprint) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when creating {sprint.SprintName}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return CreatedAtAction(nameof(GetProjectSprint), new { SprintId = sprint.SprintId, }, sprint);
@@ -214,29 +170,14 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [ValidateProjectExists]
+        [ValidateSprintExists]
         [HttpPost("{ProjectId}/sprints/{SprintId}/lists")]
         public async Task<ActionResult> CreateProjectSprintList ([Required] int ProjectId, [Required] int SprintId, [FromBody, Required] SprintList sprintList) 
         {
-            var project = await _projectsRepository.GetProject(ProjectId);
-            var sprint = await _sprintRepository.GetSprint(SprintId);
-
-            if (project == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Project not found.");
-            }
-
-            if (sprint == null) 
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             if (await _sprintListRepository.CreateSprintList(sprintList) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when creating {sprintList.Name}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return CreatedAtAction(nameof(GetProjectSprintList), new { SprintListId = sprintList.SprintListId, }, sprintList);
@@ -254,27 +195,16 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        [HttpDelete("{ProjectId}/sprints")]
-        public async Task<ActionResult<Project>> DeleteProjectSprint([Required] int projectId, [FromQuery, Required] int sprintId)
+        [ValidateProjectExists]
+        [ValidateSprintExists]
+        [HttpDelete("{projectId}/sprints/{sprintId}")]
+        public async Task<ActionResult<Project>> DeleteProjectSprint([Required] int projectId, [Required] int sprintId)
         {
-            var project = await _projectsRepository.GetProject(projectId);
-
-            if (project == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Project not found.");
-            }
-
             var sprint = await _sprintRepository.GetSprint(sprintId);
-
-            if (sprint == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint not found.");
-            }
 
             if (await _sprintRepository.DeleteSprint(sprint) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when deleting {sprint.SprintName}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return NoContent();
@@ -292,34 +222,17 @@ namespace api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        [HttpDelete("{projectId}/sprints/{sprintId}/lists")]
-        public async Task<ActionResult<Project>> DeleteProjectSprintList([Required] int projectId, [Required] int sprintId, [FromQuery, Required] int sprintListId)
+        [ValidateProjectExists]
+        [ValidateSprintExists]
+        [ValidateSprintListExists]
+        [HttpDelete("{projectId}/sprints/{sprintId}/lists/{sprintListId}")]
+        public async Task<ActionResult<Project>> DeleteProjectSprintList([Required] int projectId, [Required] int sprintId, [Required] int sprintListId)
         {
-            var project = await _projectsRepository.GetProject(projectId);
-
-            if (project == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Project not found.");
-            }
-
-            var sprint = await _sprintRepository.GetSprint(sprintId);
-
-            if (sprint == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint not found.");
-            }
-
             var sprintList = await _sprintListRepository.GetSprintList(sprintListId);
-
-            if (sprintList == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Sprint list not found.");
-            }
 
             if (await _sprintListRepository.DeleteSprintList(sprintList) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when deleting {sprint.SprintName}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return NoContent();

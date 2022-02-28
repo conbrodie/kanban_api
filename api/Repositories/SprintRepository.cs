@@ -20,7 +20,7 @@ namespace api.Repositories
 
         public async Task<bool> CreateSprint(Sprint sprint)
         {
-           await _context.AddAsync(sprint);
+           _context.Add(sprint);
            return await Save();
         }
 
