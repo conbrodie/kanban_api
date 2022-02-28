@@ -43,16 +43,15 @@ namespace api
             services.AddControllers()
                     .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
             
+            var server = Configuration["DbServer"] ?? "127.0.0.1";
+            var port = Configuration["DbPort"] ?? "1433"; // Default SQL Server port
+            var user = Configuration["DbUser"] ?? "SA";
+            var password = Configuration["Password"] ?? Environment.GetEnvironmentVariable("SA_PASSWORD");
+            var database = Configuration["Database"] ?? "kanban";
 
-            // var server = Configuration["DbServer"] ?? "127.0.0.1";
-            // var port = Configuration["DbPort"] ?? "1433"; // Default SQL Server port
-            // var user = Configuration["DbUser"] ?? "SA"; 
-            // var password = Configuration["Password"] ?? Environment.GetEnvironmentVariable("SA_PASSWORD");
-            // var database = Configuration["Database"] ?? "kanban";
-
-            var connectionString = "Server=localhost\\SQLEXPRESS01;Initial Catalog=kanban;Trusted_Connection=True;";
+            var connectionString = $"Server={server},{port};Initial Catalog={database};User ID={user};Password={password}";
+            // var connectionString = "Server=localhost\\SQLEXPRESS01;Initial Catalog=kanban;Trusted_Connection=True;";
 
             // Add Db context as a service to our application
             services.AddDbContext<AppDbContext>(options => {
@@ -125,8 +124,6 @@ namespace api
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            // app.UseHttpsRedirection();
 
             app.ConfigureCustomExceptionMiddleware();
 
