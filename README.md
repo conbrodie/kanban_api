@@ -11,4 +11,4 @@ git clone https://github.com/conbrodie/kanban_api.git && cd api
 
 Create a .env file in the /api folder with the following variable -> $SA_PASSWORD=YourPasswordHere
 
-docker-compose up -d
+docker-compose up --build
