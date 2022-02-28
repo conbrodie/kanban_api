@@ -9,6 +9,6 @@ An API designed to simulate a simple kanban board. Built using .Net core and use
 
 git clone https://github.com/conbrodie/kanban_api.git && cd api 
 
-Create a .env file with following variables ...
+Create a .env file with following variable -> $SA_PASSWORD=YourPasswordHere
 
 docker-compose up -d
