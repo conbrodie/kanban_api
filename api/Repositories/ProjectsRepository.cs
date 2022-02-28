@@ -144,7 +144,7 @@ namespace api.Repositories
 
         public async Task<bool> UpdateProject(Project project, List<int> userId, List<int> departmentId)
         {
-            var users = await _context.Users.Where(user => userId.Contains(user.Id)).AsNoTracking().ToListAsync();
+            var users = await _context.Users.Where(user => userId.Contains(user.Id)).ToListAsync();
             var departments = await _context.Departments.Where(dep => departmentId.Contains(dep.DepartmentId)).ToListAsync();
 
             var projectMembersToDelete = await _context.ProjectMembers.Where(p => p.ProjectId == project.ProjectId).ToListAsync();

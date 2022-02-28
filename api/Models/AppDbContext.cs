@@ -22,7 +22,6 @@ namespace api.Models
         public DbSet<SubTask> SubTasks { get; set; }
         public DbSet<SubTaskAssignee> SubTaskAssignees { get; set; }
         public DbSet<CardComment> CardComments { get; set; }
-        public DbSet<CardCommentVote> CardCommentVotes { get; set; }
         public DbSet<ProjectDepartment> ProjectDepartments { get; set; }
           
         protected override void OnModelCreating(ModelBuilder builder)
@@ -32,13 +31,21 @@ namespace api.Models
             builder.Entity<User>(entity =>
             {
                 entity.ToTable(name:"Users");
-                entity.Property(e => e.Id).HasColumnName("UserId");
+                entity.HasKey(t => t.Id);
+                entity.Property(t => t.Id).HasColumnName("UserId").ValueGeneratedOnAdd();
             });
 
+            builder.Entity<ProjectMember>()
+                .HasKey(x => x.ProjectMemberId);
             builder.Entity<ProjectMember>()
                 .HasOne(p => p.Project)
                 .WithMany(p => p.Members)
                 .HasForeignKey(p=> p.ProjectId);
+            builder.Entity<ProjectMember>()
+                .HasOne(p => p.User)
+                .WithMany(p => p.Projects)
+                .HasForeignKey(p=> p.UserId);
+
             builder.Entity<Sprint>()
                 .HasOne(p => p.Project)
                 .WithMany(p => p.Sprints)
@@ -97,18 +104,18 @@ namespace api.Models
             builder.Entity<CardComment>()
                 .HasOne(x => x.User);
 
-            builder.Entity<CardCommentVote>()
-               .HasKey(x => x.CardCommentVoteId);
-            builder.Entity<CardCommentVote>()
-                .HasOne(x => x.CardComment)
-                .WithMany(x => x.Votes)
-                .HasForeignKey(x => x.CardCommentId)
-                .OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<CardCommentVote>()
-                .HasOne(x => x.User)
-                .WithMany(x => x.Votes)
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // builder.Entity<CardCommentVote>()
+            //    .HasKey(x => x.CardCommentVoteId);
+            // builder.Entity<CardCommentVote>()
+            //     .HasOne(x => x.CardComment)
+            //     .WithMany(x => x.Votes)
+            //     .HasForeignKey(x => x.CardCommentId)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            // builder.Entity<CardCommentVote>()
+            //     .HasOne(x => x.User)
+            //     .WithMany(x => x.Votes)
+            //     .HasForeignKey(x => x.UserId)
+            //     .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
