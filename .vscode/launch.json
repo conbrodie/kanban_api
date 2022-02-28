@@ -10,7 +10,9 @@
         "request": "launch",
         "preLaunchTask": "build",
         "program": "${workspaceFolder}/api/bin/Debug/net5.0/api.dll",
-        "args": [],
+        "args": ["run",
+            "debug"
+        ],
         "cwd": "${workspaceFolder}/api",
         "stopAtEntry": false,
         "serverReadyAction": {

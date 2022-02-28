@@ -7,9 +7,11 @@ namespace api.Repositories
 {
     public interface IUserRepository
     {
+        Task<ICollection<User>> GetUsers();
         Task<UserDTO> GetUserByEmailAsync(string email);
         Task<User> GetUserByIdAsync(int userId);
         Task<List<User>> GetUsersAsync(List<int> userId);
+        Task<List<User>> CreateUser(List<int> userId);
         Task<ICollection<UserDTO>> Search(string searchQuery, List<int> creatorId);
     }
 }

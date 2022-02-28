@@ -9,6 +9,7 @@ using api.Models;
 using api.Repositories;
 using Microsoft.AspNetCore.Http;
 using api.DTO;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -17,62 +18,86 @@ namespace api.Controllers
     public class UsersController : ControllerBase
     {    
         private readonly IUserRepository _userRepository;
-         private readonly UserManager<User> _userManager;
+        private readonly UserManager<User> _userManager;
+        private IMapper _mapper;
 
         public UsersController(
             IUserRepository userRepository,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IMapper mapper)
         {
             _userRepository = userRepository;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
-        [HttpGet]
+        /// <summary>
+        /// Gets a list of all users.
+        /// </summary>
+        /// <returns>A list of users.</returns>
+        /// <response code="200">Returns a list of users.</response>
         [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IList<User>>> GetUsersForClaims (Claim claim)
+        [HttpGet("all")]
+        public async Task<ActionResult<ICollection<User>>> GetUsers ()
         {
-            try
-            {
-                var result = await _userManager.GetUsersForClaimAsync(claim);
-
-                if (result.Any())
-                {
-                    return Ok(result);
-                }
-
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving users from the database");
-            }
+           return Ok(await _userRepository.GetUsers());
 
         }
 
-        [HttpGet("{search}")]
+        /// <summary>
+        /// Gets a user.
+        /// </summary>
+        /// <returns>A user.</returns>
+        /// <response code="200">Returns a user.</response>
+        /// <response code="400">One or more validation errors have occured.</response>
+        /// <response code="404">Not found.</response>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<ICollection<UserDTO>>> Search([FromQuery] string searchQuery, [FromQuery] List<int> id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<User>> GetUser (int userId)
         {
-            try
-            {
-                var result = await _userRepository.Search(searchQuery, id);
+           var user = await _userRepository.GetUserByIdAsync(userId);
 
-                if (result.Any())
+           if (user == null) 
+           {
+               return NotFound();
+           }
+
+           return Ok(user);
+        }
+
+        /// <summary>
+        /// Registers a user.
+        /// </summary>
+        /// <returns>A registerd user</returns>
+        /// <response code="201">Returns a user.</response>
+        /// <response code="400">One or more validation errors have occured.</response>
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [HttpPost]
+        public async Task<IActionResult> Register(UserRegistrationModel user)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var newUser = _mapper.Map<User>(user);
+
+            var result = await _userManager.CreateAsync(newUser);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors;
+                foreach(var err in errors)
                 {
-                    return Ok(result);
+                    ModelState.AddModelError(err.Code, err.Description);
                 }
-
-                return NotFound();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+                return StatusCode(500, ModelState);
             }
 
+            return CreatedAtAction(nameof(GetUser), new { Id = newUser.Id }, newUser);
         }
     }
 }

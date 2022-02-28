@@ -3,187 +3,298 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using api.Repositories;
 using api.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Linq;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 
 namespace api.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ValidateModel]
     public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IDepartmentMemberRepository _departmentMemberRepository;
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
+        private IMapper _mapper;
 
-        public DepartmentsController(IDepartmentRepository departmentRepository, IDepartmentMemberRepository departmentMemberRepository, UserManager<User> userManager, IUserRepository userRepository)
+        public DepartmentsController(IDepartmentRepository departmentRepository, IDepartmentMemberRepository departmentMemberRepository, UserManager<User> userManager, IUserRepository userRepository, IMapper mapper)
         {
             _departmentRepository = departmentRepository;
             _departmentMemberRepository = departmentMemberRepository;
             _userManager = userManager;
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
-        [ProducesResponseType(500)]
-        [AllowAnonymous]
+        /// <summary>
+        /// Gets all departments.
+        /// </summary>
+        /// <returns>A list of departments.</returns>
+        /// <response code="200">List of all the departments with id, name and badge color.</response>
+        [ProducesResponseType(200)]
         [HttpGet]
-        public async Task<ICollection<DepartmentDTO>> GetDepartments()
+        public async Task<ActionResult<ICollection<DepartmentPreviewDTO>>> GetDepartments()
         {
-            return await _departmentRepository.GetDepartments();
+            var allDepartments = await _departmentRepository.GetDepartments();
+            
+            ICollection<DepartmentPreviewDTO> departmentPreviewDTOs = _mapper.Map<ICollection<Department>, ICollection<DepartmentPreviewDTO>>(allDepartments);
+
+            return Ok(departmentPreviewDTOs);
         }
 
-        [ProducesResponseType(500)]
-        [AllowAnonymous]
-        [HttpGet]
-         [HttpGet("names")]
-        public async Task<List<string>> GetDepartmentNames()
+        /// <summary>
+        /// Gets all department names.
+        /// </summary>
+        /// <returns>A list of department names.</returns>
+        /// <response code="200">List of all the departments names.</response>
+        [ProducesResponseType(200)]
+        [HttpGet("names")]
+        public async Task<ActionResult<List<string>>> GetDepartmentNames()
         {
-            return await _departmentRepository.GetDepartmentNames();
+            return Ok(await _departmentRepository.GetDepartmentNames());
         }
 
+        /// <summary>
+        /// Gets a department.
+        /// </summary>
+        /// <returns>A department.</returns>
+        /// <response code="200">Current information for a depatment.</response>
+        /// <response code="404">Department not found.</response>
+        [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
+        [ValidateDepartmentExists]
         [HttpGet("{departmentId}")]
-        public async Task<ActionResult<Department>> GetDepartment([FromBody] int departmentId)
+        public async Task<ActionResult<DepartmentDTO>> GetDepartment([Required] int departmentId)
         {
             var department = await _departmentRepository.GetDepartment(departmentId);
 
-            if (department == null)
-            {
-                return NotFound();
-            }
+            var departmentDTO = _mapper.Map<DepartmentDTO>(department);
 
-            return department;
+            return Ok(departmentDTO);
         }
 
-        [ProducesResponseType(500)]
-        [HttpGet("departments/{departmentId}/members/all")]
-        public async Task<ICollection<DepartmentMember>> GetAllDepartmentMembers([FromBody] int departmentId)
-        {
-            return await _departmentMemberRepository.GetAllDepartmentMembers(departmentId);
-        }
-
+        /// <summary>
+        /// Gets all members for a specific department.
+        /// </summary>
+        /// <returns>A list of members.</returns>
+        /// <response code="200">List of all members in a department.</response>
+        /// <response code="404">Department not found.</response>
+        [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        [HttpGet("{departmentId}/members/{departmentMemberId}")]
-        public async Task<ActionResult<DepartmentMember>> GetDepartmentMember([FromBody] int departmentMemberId)
+        [ValidateDepartmentExists]
+        [HttpGet("{departmentId}/members/all")]
+        public async Task<ActionResult<ICollection<DepartmentMemberDTO>>> GetAllDepartmentMembers([Required] int departmentId)
         {
-            var departmentMember = await _departmentMemberRepository.GetDepartmentMember(departmentMemberId);
+            var departmentMembers = await _departmentRepository.GetAllDepartmentMembers(departmentId);
 
-            if (departmentMember == null)
-            {
-                return NotFound();
-            }
+            ICollection<DepartmentMemberDTO> departmentMemberDTOs = _mapper.Map<ICollection<DepartmentMember>, ICollection<DepartmentMemberDTO>>(departmentMembers);
 
-            return departmentMember;
+            return Ok(departmentMemberDTOs);
         }
 
-        [HttpPut("{departmentId}")]
+        /// <summary>
+        /// Gets a department member. 
+        /// </summary>
+        /// <returns>A department member.</returns>
+        /// <response code="200">A department member.</response>
+        /// <response code="404">Not found.</response>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ValidateDepartmentExists]
+        [ValidateDepartmentMemberExists]
+        [HttpGet("{departmentId}/members/{departmentMemberId}")]
+        public async Task<ActionResult<DepartmentMemberDTO>> GetDepartmentMember([Required] int departmentId, [Required] int departmentMemberId)
+        {
+            var departmentMember = await _departmentRepository.GetDepartmentMember(departmentMemberId);
+
+            var departmentMemberDTO = _mapper.Map<DepartmentMemberDTO>(departmentMember);
+
+            return Ok(departmentMemberDTO);
+        }
+
+        /// <summary>
+        /// Updates a department.
+        /// </summary>
+        /// <returns>An updated department.</returns>
+        /// <response code="204">Department updated.</response>
+        /// <response code="400">One or more validation errors occurred.</response>
+        /// <response code="404">Department not found.</response>
+        /// <response code="500">Something when wrong when updating the department.</response>
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult> UpdateDepartment(int departmentId, [FromBody] Department department, [FromQuery] List<int> userId)
+        [ValidateDepartmentExists]
+        [ValidateUsersExists]
+        [HttpPut("{departmentId}")]
+        public async Task<ActionResult> UpdateDepartment([Required] int departmentId, [FromBody, Required] Department department, [FromQuery] List<int> userId)
         {
-
-            if (department == null)
-            {
-                return BadRequest(ModelState);
-            }
-
             if (departmentId != department.DepartmentId)
             {
-                return BadRequest(ModelState);
+                ModelState.AddModelError(string.Empty, "DepartmentId in request body does not match path ID.");
+                return new BadRequestError(ModelState);
             }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             if (await _departmentRepository.UpdateDepartment(department, userId) == false)
             {
-                ModelState.AddModelError("", $"Something went wrong when updating {department.DepartmentName}");
-                return StatusCode(500, ModelState);
+                return new InternalServerError();
             }
 
             return NoContent();
         }
 
-        [HttpPost]
+        /// <summary>
+        /// Creates a department.
+        /// </summary>
+        /// <returns>A created department.</returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /departments
+        ///     {
+        ///        "DepartmentName": "Name",
+        ///        "DepartmentDescription": "Description",
+        ///        "Color": "#fff",
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="201">Created the department.</response>
+        /// <response code="400">One or more validation errors occurred.</response>
+        /// <response code="404">Not found.</response>
+        /// <response code="500">Something went wrong when creating the department.</response>
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult> CreateDepartment([FromBody] Department department, [FromQuery] int userId)
+        [ValidateUserExists]
+        [HttpPost]
+        public async Task<ActionResult> CreateDepartment([FromBody, Required] Department department, [FromQuery, Required] int userId)
         {
-            if (department == null)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var user = await _userRepository.GetUserByIdAsync(userId);
 
             if (!await _departmentRepository.CreateDepartment(department, user))
             {
-                ModelState.AddModelError("", $"Something went wrong when saving {department.DepartmentName}");
-                return StatusCode(500, ModelState);
+               return new InternalServerError();
             }
 
             return CreatedAtAction(nameof(GetDepartment), new { DepartmentId = department.DepartmentId }, department);
         }
 
-        [HttpDelete("{departmentId}")]
-        [ProducesResponseType(204)]
+        /// <summary>
+        /// Adds a member to a department.
+        /// </summary>
+        /// <returns>A department member.</returns>
+        /// <response code="201">Added the member to the department.</response>
+        /// <response code="400">One or more validation errors occurred.</response>
+        /// <response code="404">Not Found.</response>
+        /// <response code="500">Something went wrong when adding the member to the department.</response>
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult> DeleteDepartment(int departmentId, [FromBody] Department department)
+        [ValidateDepartmentExists]
+        [HttpPost("{departmentId}/members")]
+        public async Task<ActionResult> AddMember([Required] int departmentId, [FromBody, Required] DepartmentMember departmentMember)
         {
-            if (department == null)
+            var isMember = await _departmentRepository.IsDepartmentMember(departmentMember.UserId);
+            var user = await _userRepository.GetUserByIdAsync(departmentMember.UserId);
+            var department = await _departmentRepository.GetDepartment(departmentId);
+
+            if (isMember) 
             {
-                return BadRequest(ModelState);
+                ModelState.AddModelError("", "This user is already a member of this department");
+                return new NotFoundError(ModelState);
             }
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (await _departmentRepository.DeleteDepartment(department) == false)
+            if (user == null)
             {
-                ModelState.AddModelError("", $"Something went wrong when delete {department.DepartmentName}");
-                return StatusCode(500, ModelState);
+                ModelState.AddModelError("", "The user was not found");
+                return new NotFoundError(ModelState);
+            }
+
+            if (!await _departmentRepository.AddMember(department, user))
+            {
+                return new InternalServerError();
+            }
+
+            return CreatedAtAction(nameof(GetDepartmentMember), new { DepartmentMemberId = departmentMember.DepartmentId }, departmentMember);
+        }
+
+        /// <summary>
+        /// Removes a member from a department.
+        /// </summary>
+        /// <returns>No content.</returns>
+        /// <response code="204">Removed the member.</response>
+        /// <response code="400">One or more validation errors occurred.</response>
+        /// <response code="404">Not Found.</response>
+        /// <response code="500">Something went wrong when removing the member.</response>
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        [ValidateDepartmentExists]
+        [ValidateDepartmentMemberExists]
+        [HttpDelete("{departmentId}/members")]
+        public async Task<ActionResult> RemoveMember([Required] int departmentId, [FromQuery, Required] int departmentMemberId)
+        {
+            if (await _departmentRepository.RemoveDepartmentMember(departmentMemberId) == false) 
+            {
+                return new InternalServerError();
             }
 
             return NoContent();
         }
 
-        [HttpGet("search")]
-        [ProducesResponseType(200)]
+        /// <summary>
+        /// Deletes a department.
+        /// </summary>
+        /// <returns>No content.</returns>
+        /// <response code="204">Deleted the department.</response>
+        /// <response code="400">One or more validation errors occurred.</response>
+        /// <response code="404">Not Found.</response>
+        /// <response code="500">Something went wrong when deleting the department.</response>
+        [ProducesResponseType(204)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<ICollection<Department>>> Search([FromQuery] string searchQuery, [FromQuery] List<int> departmentId)
+        [ValidateDepartmentExists]
+        [HttpDelete("{departmentId}")]
+        public async Task<ActionResult> DeleteDepartment([Required] int departmentId)
         {
-            try
-            {
-                var result = await _departmentRepository.Search(searchQuery, departmentId);
+            var department = await _departmentRepository.GetDepartment(departmentId);
 
-                if (result.Any())
-                {
-                    return Ok(result);
-                }
-
-                return NotFound();
-            }
-            catch (Exception)
+            if (await _departmentRepository.DeleteDepartment(department) == false)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+                return new InternalServerError();
             }
+
+            return NoContent();
         }
+
+        // [ProducesResponseType(200)]
+        // [ProducesResponseType(404)]
+        // [ProducesResponseType(500)]
+        // [HttpGet("search")]
+        // public async Task<ActionResult<ICollection<Department>>> Search([FromQuery] string searchQuery, [FromQuery] List<int> departmentId)
+        // {
+        //     try
+        //     {
+        //         var result = await _departmentRepository.Search(searchQuery, departmentId);
+
+        //         if (result.Any())
+        //         {
+        //             return Ok(result);
+        //         }
+
+        //         return NotFound();
+        //     }
+        //     catch (Exception)
+        //     {
+        //         return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+        //     }
+        // }
     }
 }
 

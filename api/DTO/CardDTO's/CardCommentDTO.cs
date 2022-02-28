@@ -5,13 +5,12 @@ using api.Models;
 
 namespace api.DTO
 {
-    public class ProjectTaskCommentDTO
+    public class CardCommentDTO
     {
         [Key] 
-        public int ProjectTaskCommentId { get; set; }
+        public int CardCommentId { get; set; }
         public String Description { get; set; }
         public DateTime DateCreated { get; set; }
-        public ICollection<CardCommentVote> ProjectTaskCommentVotes { get; set; }
         public UserDTO User { get; set; }
     }
 }

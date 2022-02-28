@@ -22,6 +22,16 @@ namespace api.Repositories
             _userManager = userManager;
         }
 
+        public Task<List<User>> CreateUser(List<int> userId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public async Task<ICollection<User>> GetUsers()
+        {
+           return await _context.Users.ToListAsync();
+        }
+
         public async Task<UserDTO> GetUserByEmailAsync(string email)
         {
             var user = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();

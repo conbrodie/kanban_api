@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "EG960af2Uk49AcCAQZSRTmPccnr59KBk3T23dfj9C4W7xU5Z961rNCnsHj/kQ5qQcWew/sWUkR43wMPmMSp20g==",
+  "dgSpecHash": "hEQnvuxBLmBene0IrncmxpZU1zw/LLC/5r6shkeYZQNLLr3P76Jl+QdKdzNqhfuxB0zhlAYoLaGqj7Qu+i2gHQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\warre\\OneDrive\\Desktop\\kanban_api\\api\\api.csproj",
   "expectedPackageFiles": [
@@ -115,10 +115,10 @@
     "C:\\Users\\warre\\.nuget\\packages\\serilog.sinks.console\\3.1.1\\serilog.sinks.console.3.1.1.nupkg.sha512",
     "C:\\Users\\warre\\.nuget\\packages\\serilog.sinks.debug\\1.0.1\\serilog.sinks.debug.1.0.1.nupkg.sha512",
     "C:\\Users\\warre\\.nuget\\packages\\serilog.sinks.file\\4.1.0\\serilog.sinks.file.4.1.0.nupkg.sha512",
-    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
-    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
-    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
-    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512",
+    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore\\6.2.3\\swashbuckle.aspnetcore.6.2.3.nupkg.sha512",
+    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.2.3\\swashbuckle.aspnetcore.swagger.6.2.3.nupkg.sha512",
+    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.2.3\\swashbuckle.aspnetcore.swaggergen.6.2.3.nupkg.sha512",
+    "C:\\Users\\warre\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.2.3\\swashbuckle.aspnetcore.swaggerui.6.2.3.nupkg.sha512",
     "C:\\Users\\warre\\.nuget\\packages\\system.appcontext\\4.1.0\\system.appcontext.4.1.0.nupkg.sha512",
     "C:\\Users\\warre\\.nuget\\packages\\system.buffers\\4.5.0\\system.buffers.4.5.0.nupkg.sha512",
     "C:\\Users\\warre\\.nuget\\packages\\system.collections\\4.3.0\\system.collections.4.3.0.nupkg.sha512",

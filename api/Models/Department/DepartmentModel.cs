@@ -9,11 +9,13 @@ namespace api.Models
     public class Department
     {
         [Key] 
+        [Required(ErrorMessage = "DepartmentId required.")]
         public int DepartmentId { get; set; }
+        [Required(ErrorMessage = "Department name required.")]
         public String DepartmentName { get; set; }
         public String DepartmentDescription { get; set; }
         public String Color { get; set; }
-        public ICollection<DepartmentMember> DepartmentMembers { get; set; }
-        public ICollection<ProjectDepartment> ProjectDepartments { get; set; }
+        public ICollection<DepartmentMember> Members { get; set; }
+        public ICollection<ProjectDepartment> Projects { get; set; }
     }
 }

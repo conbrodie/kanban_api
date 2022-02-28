@@ -9,15 +9,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Identity;
-using System.Reflection;
-using Microsoft.Extensions.FileProviders;
-using System.IO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 using SignalR.Providers;
 using System;
 using api.Extensions;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace api
 {
@@ -44,13 +44,16 @@ namespace api
                     .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-            var server = Configuration["DbServer"] ?? "127.0.0.1";
-            var port = Configuration["DbPort"] ?? "1433"; // Default SQL Server port
-            var user = Configuration["DbUser"] ?? "SA"; // Warning do not use the SA account
-            var password = Configuration["Password"] ?? "DockerTest123";
-            var database = Configuration["Database"] ?? "kanban";
+            
 
-            var connectionString = $"Server={server},{port};Initial Catalog={database};User ID={user};Password={password}";
+            // var server = Configuration["DbServer"] ?? "127.0.0.1";
+            // var port = Configuration["DbPort"] ?? "1433"; // Default SQL Server port
+            // var user = Configuration["DbUser"] ?? "SA"; // Warning do not use the SA account
+            // var password = Configuration["Password"] ?? "DockerTest123";
+            // var database = Configuration["Database"] ?? "kanban";
+
+            // var connectionString = $"Server={server},{port};Initial Catalog={database};User ID={user};Password={password}";
+            var connectionString = "Server=localhost\\SQLEXPRESS01;Initial Catalog=kanban;Trusted_Connection=True;";
 
             Console.WriteLine(connectionString);
 
@@ -58,7 +61,25 @@ namespace api
             services.AddDbContext<AppDbContext>(options => 
                 options.UseSqlServer(connectionString));
             
-            services.AddControllersWithViews();
+            services.AddControllersWithViews( options => {
+                options.Filters.Add<ValidateModelAttribute>();
+            });
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Kanban API",
+                    Description = "An ASP.NET Core Web API for managing a simple Kanban board. To get started, register a user then create a Project -> Sprint -> Sprint List -> Card."
+                });
+
+                options.SchemaFilter<ExampleSchemaFilter>();
+
+                // using System.Reflection;
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            });
 
             services.AddIdentity<User, UserRole>(options =>
                     {
@@ -80,7 +101,18 @@ namespace api
             services.AddScoped<IDepartmentMemberRepository, DepartmentMemberRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IClaimsRepository, ClaimsRepository>();
+            services.AddScoped<ICardRepository, CardRepository>();
+            services.AddScoped<ISprintsRepository, SprintRepository>();
+            services.AddScoped<ISprintListRepository, SprintListRepository>();
             services.AddSingleton<IUserIdProvider, EmailBasedUserIdProvider>();
+
+            // services.PostConfigure<ApiBehaviorOptions>(apiBehaviorOptions => apiBehaviorOptions.InvalidModelStateResponseFactory = actionContext => {
+            //     return new BadRequestObjectResult(new {
+            //         StatusCode = 400,
+            //         Messages = actionContext.ModelState.Values.SelectMany(x => x.Errors)
+            //             .Select(x => x.ErrorMessage)
+            //     });
+            // });
 
             // Add mapping for DTO
             services.AddAutoMapper(typeof(MappingProfile));
@@ -116,6 +148,14 @@ namespace api
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                options.RoutePrefix = string.Empty;
+            });
 
             app.UseEndpoints(endpoints =>
             {

@@ -39,19 +39,15 @@ namespace api.Repositories
 
         public async Task<ICollection<Project>> GetProjects(bool isApproved)
         {
-            var projects = await _context.Projects.Where(p => p.Approved == isApproved).ToListAsync();
+            var previews = await _context.Projects
+                .Include(x => x.Members)
+                    .ThenInclude(x => x.User)
+                .Include(x => x.Departments)
+                    .ThenInclude(x => x.Department)
+                .Where(p => p.Approved == isApproved)
+                .ToListAsync();
 
-            foreach (var project in projects)
-            {
-                await _context.Entry(project)
-                            .Collection(proj => proj.Members)
-                            .Query()
-                            .Include(ProjectMember => ProjectMember.User)
-                            .AsSplitQuery()
-                            .LoadAsync();
-            }
-
-            return projects;
+            return previews;
         }
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace api.Repositories
 
         public async Task<Project> GetProject(int ProjectId)
         {
-            var Project = await _context.Projects
+            var project = await _context.Projects
                 .Include(project => project.Members)
                     .ThenInclude(user => user.User)
                 .Include(project => project.Departments)
@@ -74,21 +70,20 @@ namespace api.Repositories
                 .Where(p => p.ProjectId == ProjectId)
                 .FirstOrDefaultAsync();
 
-            return Project;
+            return project;
         }
 
         /// <summary>
         /// Gets all project members
         /// </summary>
-        /// <param name="ProjectId"></param>
+        /// <param name="projectId"></param>
         /// <returns>Project members</returns>
 
-        public async Task<ICollection<Project>> GetProjectMembers(int projectId)
+        public async Task<ICollection<ProjectMember>> GetProjectMembers(int projectId)
         {
-            return await _context.Projects
-                .Include(pm => pm.Members)
-                    .ThenInclude(u => u.User)
-                .Where(p => p.ProjectId == projectId)
+            return await _context.ProjectMembers
+                .Include(u => u.User)
+                .Where(pm => pm.ProjectId == projectId)
                 .ToListAsync();
         }
 
@@ -97,32 +92,20 @@ namespace api.Repositories
         /// </summary>
         /// <returns>All projects mapped using ProjectPreviewDTO</returns>
 
-        public async Task<ICollection<ProjectPreviewDTO>> GetProjectPreviews()
+        public async Task<ICollection<Project>> GetProjectPreviews()
         {
-            var previews = await _context.Projects
+            return await _context.Projects
                 .Include(x => x.Members)
                     .ThenInclude(x => x.User)
                 .Include(x => x.Departments)
                     .ThenInclude(x => x.Department)
                 .ToListAsync();
-
-            var projectPreviewDTO = _mapper.Map<List<ProjectPreviewDTO>>(previews);
-
-            return projectPreviewDTO;
         } 
 
         public async Task<bool> CreateProject(Project project, List<int> userId, List<int> departmentId)
         {
             var users = await _context.Users.Where(user => userId.Contains(user.Id)).ToListAsync();
             var departments = await _context.Departments.Where(dep => departmentId.Contains(dep.DepartmentId)).ToListAsync();
-
-            if (!users.Any(user => userId.Contains(user.Id))) {
-                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "User's not found. Ensure you are supplying valid userId's.");
-            }
-
-            if (departmentId != null && !departments.Any(dep => departmentId.Contains(dep.DepartmentId))) { 
-                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Department's not found. Ensure you are supplying valid departmentId's.");
-            }
 
             foreach (var user in users)
             {
@@ -132,7 +115,7 @@ namespace api.Repositories
                     User = user,
                     Project = project
                 };
-                await _context.AddAsync(projectMember);
+                _context.Add(projectMember);
             }
 
             foreach (var department in departments)
@@ -142,10 +125,10 @@ namespace api.Repositories
                     Department = department,
                     Project = project
                 };
-                await _context.AddAsync(projectDepartment);
+                _context.Add(projectDepartment);
             }
 
-            await _context.AddAsync(project);
+            _context.Add(project);
 
             return await Save();
         }
@@ -164,14 +147,6 @@ namespace api.Repositories
             var users = await _context.Users.Where(user => userId.Contains(user.Id)).ToListAsync();
             var departments = await _context.Departments.Where(dep => departmentId.Contains(dep.DepartmentId)).ToListAsync();
 
-            if (!users.Any(user => userId.Contains(user.Id))) {
-                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "User's not found. Ensure you are supplying valid userId's.");
-            }
-
-            if (departmentId != null && !departments.Any(dep => departmentId.Contains(dep.DepartmentId))) { 
-                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Department's not found. Ensure you are supplying valid departmentId's.");
-            }
-
             var projectMembersToDelete = await _context.ProjectMembers.Where(p => p.ProjectId == project.ProjectId).ToListAsync();
             var projectDepartmentsToDelete = await _context.ProjectDepartments.Where(p => p.ProjectId == project.ProjectId).ToListAsync();
 
@@ -185,7 +160,7 @@ namespace api.Repositories
                     User = user,
                     Project = project
                 };
-                await _context.AddAsync(projectMember);
+                _context.Add(projectMember);
             }
 
             foreach (var department in departments)
@@ -195,8 +170,9 @@ namespace api.Repositories
                     Department = department,
                     Project = project
                 };
-                await _context.AddAsync(projectDepartment);
+                _context.Add(projectDepartment);
             }
+            
             _context.Update(project);
 
             return await Save();

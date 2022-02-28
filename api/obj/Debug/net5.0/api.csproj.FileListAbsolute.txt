@@ -243,3 +243,5 @@ C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.RazorTargetA
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.Views.pdb
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.csproj.CopyComplete
 C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.genruntimeconfig.cache
+C:\Users\warre\OneDrive\Desktop\kanban_api\api\bin\Debug\net5.0\api.xml
+C:\Users\warre\OneDrive\Desktop\kanban_api\api\obj\Debug\net5.0\api.xml

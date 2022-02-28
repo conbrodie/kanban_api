@@ -8,9 +8,11 @@ namespace api.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Project, ProjectPreviewDTO>().ReverseMap();
+            // PROJECT DTO
+
+            CreateMap<Project, ProjectPreviewDTO>();
             CreateMap<ProjectMember, ProjectMemberDTO>()
-            .ForMember(n => n.Id, opt => opt.MapFrom(src => src.User.Id))
+            .ForMember(n => n.UserId, opt => opt.MapFrom(src => src.User.Id))
             .ForMember(n => n.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
             .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName));
             CreateMap<User, ProjectMemberDTO>().ReverseMap();
@@ -19,10 +21,34 @@ namespace api.Mapping
             .ForMember(n => n.DepartmentName, opt => opt.MapFrom(src => src.Department.DepartmentName))
             .ForMember(n => n.Color, opt => opt.MapFrom(src => src.Department.Color));
             CreateMap<Department, ProjectDepartmentDTO>().ReverseMap();
+            CreateMap<Project, ProjectDTO>().ReverseMap();
 
+            // DEPARTMENT DTO
 
-            CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<Department, DepartmentPreviewDTO>().ReverseMap();
             CreateMap<Department, DepartmentDTO>().ReverseMap();
+            CreateMap<DepartmentMember, DepartmentMemberDTO>()
+            .ForMember(n => n.UserId, opt => opt.MapFrom(src => src.User.Id))
+            .ForMember(n => n.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
+            .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName));
+            CreateMap<User, DepartmentMemberDTO>().ReverseMap();
+
+            // CARD DTO
+
+            CreateMap<Card, CardDTO>().ReverseMap();
+            CreateMap<CardMember, CardMemberDTO>()
+            .ForMember(n => n.UserId, opt => opt.MapFrom(src => src.User.Id))
+            .ForMember(n => n.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
+            .ForMember(n => n.LastName, opt => opt.MapFrom(src => src.User.LastName));
+            CreateMap<User, CardMemberDTO>().ReverseMap();
+
+            //
+            
+            CreateMap<Sprint, SprintDTO>().ReverseMap();
+            CreateMap<SprintList, SprintListDTO>().ReverseMap();
+            CreateMap<UserRegistrationModel, User>().ReverseMap();
+            CreateMap<User, UserDTO>().ReverseMap();
+
         }
     }
 }

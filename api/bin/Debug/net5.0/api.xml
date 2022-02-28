@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>api</name>
+    </assembly>
+    <members>
+        <member name="M:api.Controllers.CardController.GetCards(System.Int32)">
+            <summary>
+            Gets all cards for a given sprint list.
+            </summary>
+            <returns>A list of cards.</returns>
+            <response code="200">List of all the cards.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.GetCard(System.Int32)">
+            <summary>
+            Gets a card.
+            </summary>
+            <returns>A card.</returns>
+            <response code="200">Returns a card.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.GetCardMembers(System.Int32)">
+            <summary>
+            Gets all card members.
+            </summary>
+            <returns>A list of card members.</returns>
+            <response code="200">Returns a list of card members.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.GetCardMember(System.Int32)">
+            <summary>
+            Gets a card member.
+            </summary>
+            <returns>A card member.</returns>
+            <response code="200">Returns a card member.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.AddCardMember(System.Int32,api.Models.CardMember)">
+            <summary>
+            Adds a member to the card.
+            </summary>
+            <returns>No content.</returns>
+            <response code="201">Added the member to the card.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something when wrong when adding the member.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.RemoveCardMember(System.Int32,System.Int32)">
+            <summary>
+            Removes a member from a card.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Removed the member.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when removing the member.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.CreateCard(api.Models.Card,System.Int32)">
+            <summary>
+            Creates a card.
+            </summary>
+            <returns>A new card.</returns>
+            <response code="201">Created the card.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something when wrong when creating the card.</response>
+        </member>
+        <member name="M:api.Controllers.CardController.DeleteCard(System.Int32)">
+            <summary>
+            Removes a card.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Removed the card.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something when wrong when deleting the card.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.GetDepartments">
+            <summary>
+            Gets all departments.
+            </summary>
+            <returns>A list of departments.</returns>
+            <response code="200">List of all the departments with id, name and badge color.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.GetDepartmentNames">
+            <summary>
+            Gets all department names.
+            </summary>
+            <returns>A list of department names.</returns>
+            <response code="200">List of all the departments names.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.GetDepartment(System.Int32)">
+            <summary>
+            Gets a department.
+            </summary>
+            <returns>A department.</returns>
+            <response code="200">Current information for a depatment.</response>
+            <response code="404">Department not found.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.GetAllDepartmentMembers(System.Int32)">
+            <summary>
+            Gets all members for a specific department.
+            </summary>
+            <returns>A list of members.</returns>
+            <response code="200">List of all members in a department.</response>
+            <response code="404">Department not found.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.GetDepartmentMember(System.Int32,System.Int32)">
+            <summary>
+            Gets a department member. 
+            </summary>
+            <returns>A department member.</returns>
+            <response code="200">A department member.</response>
+            <response code="404">Not found.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.UpdateDepartment(System.Int32,api.Models.Department,System.Collections.Generic.List{System.Int32})">
+            <summary>
+            Updates a department.
+            </summary>
+            <returns>An updated department.</returns>
+            <response code="204">Department updated.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Department not found.</response>
+            <response code="500">Something when wrong when updating the department.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.CreateDepartment(api.Models.Department,System.Int32)">
+             <summary>
+             Creates a department.
+             </summary>
+             <returns>A created department.</returns>
+             <remarks>
+             Sample request:
+            
+                 POST /departments
+                 {
+                    "DepartmentName": "Name",
+                    "DepartmentDescription": "Description",
+                    "Color": "#fff",
+                 }
+            
+             </remarks>
+             <response code="201">Created the department.</response>
+             <response code="400">One or more validation errors occurred.</response>
+             <response code="404">Not found.</response>
+             <response code="500">Something went wrong when creating the department.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.AddMember(System.Int32,api.Models.DepartmentMember)">
+            <summary>
+            Adds a member to a department.
+            </summary>
+            <returns>A department member.</returns>
+            <response code="201">Added the member to the department.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when adding the member to the department.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.RemoveMember(System.Int32,System.Int32)">
+            <summary>
+            Removes a member from a department.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Removed the member.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when removing the member.</response>
+        </member>
+        <member name="M:api.Controllers.DepartmentsController.DeleteDepartment(System.Int32)">
+            <summary>
+            Deletes a department.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Deleted the department.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when deleting the department.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.GetProjectsByStatus(System.Boolean)">
+            <summary>
+            Gets projects that have been approved or not approved.
+            </summary>
+            <returns>A list of projects</returns>
+            <response code="200">Returns the projects.</response>
+            <response code="400">One or more validation errors occurred.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.GetProjectPreviews">
+            <summary>
+            Gets projects previews - a summary of the project.
+            </summary>
+            <returns>A list of project previews.</returns>
+            <response code="200">Returns the project previews.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.GetProjectMembers(System.Int32)">
+            <summary>
+            Gets the members within in a project.
+            </summary>
+            <returns>A list of members</returns>
+            <response code="200">Returns the members</response>
+            <response code="400">One or more validation errors occurred.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.GetProject(System.Int32)">
+            <summary>
+            Gets a project.
+            </summary>
+            <returns>A project</returns>
+            <response code="200">Returns the project.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.UpdateProject(System.Int32,api.Models.Project,System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{System.Int32})">
+             <summary>
+             Updates a project.
+             </summary>
+             <returns>No content.</returns>
+             <remarks>
+             Sample request:
+            
+                 put /project
+                 {
+                    "ProjectId": "1",
+                    "Title": "Project Title",
+                    "StartDate": 2022-02-18T06:00:51.826Z,
+                    "EndDate": 2022-02-18T06:00:51.826Z,
+                    "Approved": false
+                 }
+            
+             </remarks>
+             <response code="204">Updated the project.</response>
+             <response code="400">One or more validation errors occurred.</response>
+             <response code="404">Not Found.</response>
+             <response code="500">Something went wrong when updating the project.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.CreateProject(api.Models.Project,System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{System.Int32})">
+             <summary>
+             Creates a project.
+             </summary>
+             <returns>A created project.</returns>
+             <remarks>
+             Sample request:
+            
+                 POST /project
+                 {
+                    "Title": "Project Title",
+                    "StartDate": 2022-02-18T06:00:51.826Z,
+                    "EndDate": 2022-02-18T06:00:51.826Z,
+                    "Approved": false
+                 }
+            
+             </remarks>
+             <response code="201">Created the project.</response>
+             <response code="400">One or more validation errors occurred.</response>
+             <response code="400">Not found.</response>
+             <response code="500">Something went wrong when creating the project.</response>
+        </member>
+        <member name="M:api.Controllers.ProjectsController.DeleteProject(System.Int32)">
+            <summary>
+            Deletes a project.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Deleted the project.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when deleting the project.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.GetProjectSprint(System.Int32,System.Int32)">
+            <summary>
+            Gets a project sprint.
+            </summary>
+            <returns>A project sprints.</returns>
+            <response code="200">Returns a project sprint.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.GetProjectSprints(System.Int32)">
+            <summary>
+            Gets all sprints for a given project.
+            </summary>
+            <returns>A list of project sprints.</returns>
+            <response code="200">Returns a list of project sprints.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.GetProjectSprintList(System.Int32,System.Int32)">
+            <summary>
+            Gets a sprint list.
+            </summary>
+            <returns>A list sprint list.</returns>
+            <response code="200">Returns a sprint list.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.GetProjectSprintLists(System.Int32)">
+            <summary>
+            Gets all lists for a given sprint.
+            </summary>
+            <returns>A list of sprint lists.</returns>
+            <response code="200">Returns a list of sprint lists.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.CreateProjectSprint(System.Int32,api.Models.Sprint)">
+             <summary>
+             Creates a project sprint.
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST /projects/{projectId}/sprints
+                 {
+                    "ProjectId": 1,
+                    "SprintName": "Name",
+                 }
+            
+             </remarks>
+             <returns>A created project sprint.</returns>
+             <response code="201">Creates a project sprint.</response>
+             <response code="400">One or more validation errors occurred.</response>
+             <response code="404">Not Found.</response>
+             <response code="500">Something went wrong when creating the sprint.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.CreateProjectSprintList(System.Int32,System.Int32,api.Models.SprintList)">
+             <summary>
+             Creates a project sprint list.
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST /projects/{projectId}/sprints/{SprintId}
+                 {
+                    "ProjectId": 1,
+                    "SprintName": "Name",
+                 }
+            
+             </remarks>
+             <returns>A created project sprint.</returns>
+             <response code="201">Returns a list of project sprints.</response>
+             <response code="400">One or more validation errors occurred.</response>
+             <response code="404">Not Found.</response>
+             <response code="500">Something went wrong when creating the sprint list.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.DeleteProjectSprint(System.Int32,System.Int32)">
+            <summary>
+            Deletes a project sprint.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Deleted the project sprint.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when deleting the project sprint.</response>
+        </member>
+        <member name="M:api.Controllers.SprintsController.DeleteProjectSprintList(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Deletes a project sprint list.
+            </summary>
+            <returns>No content.</returns>
+            <response code="204">Deleted the project sprint.</response>
+            <response code="400">One or more validation errors occurred.</response>
+            <response code="404">Not Found.</response>
+            <response code="500">Something went wrong when deleting the project sprint.</response>
+        </member>
+        <member name="M:api.Controllers.UsersController.GetUsers">
+            <summary>
+            Gets a list of all users.
+            </summary>
+            <returns>A list of users.</returns>
+            <response code="200">Returns a list of users.</response>
+        </member>
+        <member name="M:api.Controllers.UsersController.GetUser(System.Int32)">
+            <summary>
+            Gets a user.
+            </summary>
+            <returns>A user.</returns>
+            <response code="200">Returns a user.</response>
+            <response code="400">One or more validation errors have occured.</response>
+            <response code="404">Not found.</response>
+        </member>
+        <member name="M:api.Controllers.UsersController.Register(UserRegistrationModel)">
+            <summary>
+            Registers a user.
+            </summary>
+            <returns>A registerd user</returns>
+            <response code="201">Returns a user.</response>
+            <response code="400">One or more validation errors have occured.</response>
+        </member>
+        <member name="M:api.Repositories.ProjectsRepository.GetProjects(System.Boolean)">
+            <summary>
+            Gets all projects by approved status
+            </summary>
+            <param name="isApproved"></param>
+            <returns>All projects</returns>
+        </member>
+        <member name="M:api.Repositories.ProjectsRepository.GetProject(System.Int32)">
+            <summary>
+            Gets a project
+            </summary>
+            <param name="ProjectId"></param>
+            <returns>Project</returns>
+        </member>
+        <member name="M:api.Repositories.ProjectsRepository.GetProjectMembers(System.Int32)">
+            <summary>
+            Gets all project members
+            </summary>
+            <param name="projectId"></param>
+            <returns>Project members</returns>
+        </member>
+        <member name="M:api.Repositories.ProjectsRepository.GetProjectPreviews">
+            <summary>
+            Gets all projects
+            </summary>
+            <returns>All projects mapped using ProjectPreviewDTO</returns>
+        </member>
+        <member name="M:api.Repositories.ProjectsRepository.UpdateProject(api.Models.Project,System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{System.Int32})">
+            <summary>
+            Updates a project.
+            </summary>
+            <param name="project">Project object being updated</param>
+            <param name="projectCreatorId">A List of user id's (users who created the project)</param>
+            <param name="projectSponsorId">A list of user id's (users who sponsored the project)</param>
+            <param name="projectDepartmentId">A list of department id's (departments the project is in)</param>
+            <returns>Updated record in the database</returns>
+        </member>
+    </members>
+</doc>

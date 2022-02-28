@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -9,12 +10,13 @@ namespace api.Models
     {
         [Key]
         public int ProjectId { get; set; }
-        [BindRequired]
+        [Required(ErrorMessage = "Project title required.")]
         public String Title { get; set; }
-        [BindRequired]
+        [Required(ErrorMessage = "Project start date required.")]
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        [BindRequired]
+        [Required(ErrorMessage = "Project approval status required.")]
+        [DefaultValue(false)]
         public Boolean Approved { get; set; }
         public ICollection<Sprint> Sprints { get; set; }
         public ICollection<ProjectMember> Members { get; set; }

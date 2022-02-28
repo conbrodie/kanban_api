@@ -60,14 +60,14 @@ namespace api.Models
                 .HasForeignKey(x => x.ProjectId);
             builder.Entity<ProjectDepartment>()
                 .HasOne(x => x.Department)
-                .WithMany(x => x.ProjectDepartments)
+                .WithMany(x => x.Projects)
                 .HasForeignKey(x => x.DepartmentId);
 
             builder.Entity<CardMember>()
                .HasKey(cardMember => cardMember.CardMemberId);
             builder.Entity<CardMember>()
                 .HasOne(x => x.Card)
-                .WithMany(x => x.Users)
+                .WithMany(x => x.Members)
                 .HasForeignKey(x => x.CardId);
             builder.Entity<CardMember>()
                 .HasOne(x => x.User)
