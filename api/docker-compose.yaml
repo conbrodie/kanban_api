@@ -20,10 +20,9 @@ services:
     volumes:
       - sql_data_volume:/var/opt/mssql
   api:
-    build:
-      context: .
+    image: connorbrodie1/kanban-api:prod
     ports:
-      - "5000:80"
+      - "5000:8080"
     environment:
       DbServer: "mssql-server"
       DbPort: "1433"
